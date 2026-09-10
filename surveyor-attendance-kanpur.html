@@ -1,0 +1,1251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Surveyor attendance — Kanpur</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;450;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #FAFAF6;
+    --card: #FFFFFF;
+    --ink: #16202A;
+    --ink-soft: #5A6A78;
+    --rule: #DCDCD2;
+    --rule-strong: #B9BCB2;
+    --teal-1: #DDEDE9;
+    --teal-2: #A9D3CB;
+    --teal-3: #6BB2A6;
+    --teal-4: #2F8577;
+    --teal-5: #0F4C4A;
+    --amber: #B87309;
+    --amber-bg: #FCF2DF;
+    --absent: #F0EFE8;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: "IBM Plex Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-size: 15px;
+    line-height: 1.45;
+    font-variant-numeric: tabular-nums;
+  }
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 28px 20px 72px; }
+
+  /* ---- masthead ---- */
+  .masthead { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 18px; padding-bottom: 14px; border-bottom: 2px solid var(--ink); }
+  h1 { font-size: 25px; font-weight: 600; letter-spacing: -0.015em; margin: 0; }
+  .sub { color: var(--ink-soft); font-size: 14px; margin: 0; }
+  .masthead-right { margin-left: auto; display: flex; align-items: center; gap: 14px; font-size: 13px; color: var(--ink-soft); }
+
+  button {
+    font: inherit; font-size: 13.5px; font-weight: 500;
+    color: var(--ink); background: var(--card);
+    border: 1px solid var(--rule-strong); border-radius: 3px;
+    padding: 6px 11px; cursor: pointer;
+  }
+  button:hover { border-color: var(--teal-5); color: var(--teal-5); }
+  button:focus-visible, select:focus-visible { outline: 2px solid var(--teal-4); outline-offset: 1px; }
+
+  /* ---- filters ---- */
+  .filters {
+    display: flex; flex-wrap: wrap; gap: 14px 22px; align-items: flex-end;
+    padding: 14px 0 16px; border-bottom: 1px solid var(--rule);
+  }
+  .field { display: flex; flex-direction: column; gap: 4px; }
+  .field > span { font-size: 12.5px; color: var(--ink-soft); }
+  select {
+    font: inherit; font-size: 14px; color: var(--ink);
+    background: var(--card); border: 1px solid var(--rule-strong);
+    border-radius: 3px; padding: 6px 8px; min-width: 148px;
+  }
+  .seg { display: flex; border: 1px solid var(--rule-strong); border-radius: 3px; overflow: hidden; }
+  .seg button { border: 0; border-radius: 0; border-left: 1px solid var(--rule-strong); background: var(--card); }
+  .seg button:first-child { border-left: 0; }
+  .seg button[aria-pressed="true"] { background: var(--teal-5); color: #fff; }
+  .seg button[aria-pressed="true"]:hover { color: #fff; }
+
+  /* ---- headline stats ---- */
+  .stats { display: flex; flex-wrap: wrap; gap: 0; margin: 22px 0 30px; }
+  .stat { flex: 1 1 128px; padding: 0 20px; border-left: 1px solid var(--rule); }
+  .stat:first-child { padding-left: 0; border-left: 0; }
+  .stat b { display: block; font-size: 30px; font-weight: 600; letter-spacing: -0.02em; line-height: 1.1; }
+  .stat span { font-size: 13px; color: var(--ink-soft); }
+  .stat em { display: block; font-style: normal; font-size: 12px; color: var(--teal-5); margin-top: 2px; }
+  .stat.flagged b { color: var(--amber); }
+
+  section { margin-bottom: 38px; }
+  h2 { font-size: 16px; font-weight: 600; margin: 0 0 3px; }
+  .note { font-size: 13px; color: var(--ink-soft); margin: 0 0 12px; }
+
+  /* ---- muster grid ---- */
+  .grid-scroll { overflow-x: auto; background: var(--card); border: 1px solid var(--rule); border-radius: 3px; }
+  table.muster { border-collapse: separate; border-spacing: 0; }
+  table.muster th, table.muster td { padding: 0; }
+  table.muster th.name, table.muster td.name {
+    position: sticky; left: 0; z-index: 2;
+    background: var(--card); border-right: 1px solid var(--rule-strong);
+    text-align: left; font-weight: 450; font-size: 13.5px;
+    padding: 0 14px; white-space: nowrap; min-width: 152px;
+  }
+  table.muster thead th {
+    font-weight: 450; font-size: 11px; color: var(--ink-soft);
+    height: 34px; vertical-align: bottom; padding-bottom: 5px;
+    border-bottom: 1px solid var(--rule-strong); background: var(--card);
+  }
+  table.muster thead th.name { z-index: 3; vertical-align: bottom; padding-bottom: 5px; }
+  table.muster thead th.sun { color: var(--amber); }
+  table.muster tbody td { height: 30px; border-bottom: 1px solid var(--rule); }
+  table.muster tbody tr:last-child td { border-bottom: 0; }
+  .cell { width: 19px; }
+  .mark { width: 15px; height: 21px; margin: 0 auto; border-radius: 2px; background: var(--absent); }
+  .mark.h1 { background: var(--teal-1); }
+  .mark.h2 { background: var(--teal-2); }
+  .mark.h3 { background: var(--teal-3); }
+  .mark.h4 { background: var(--teal-4); }
+  .mark.h5 { background: var(--teal-5); }
+  .mark.flag { background: var(--amber-bg); box-shadow: inset 0 0 0 1.5px var(--amber); }
+  .legend { display: flex; align-items: center; gap: 7px; font-size: 12.5px; color: var(--ink-soft); margin-top: 10px; flex-wrap: wrap; }
+  .legend .mark { width: 13px; height: 13px; margin: 0; }
+  .legend .gap { width: 12px; }
+
+  /* ---- day timeline ---- */
+  .tl { background: var(--card); border: 1px solid var(--rule); border-radius: 3px; padding: 14px 18px 6px; }
+  .tl-hours { position: relative; height: 16px; margin-left: 152px; }
+  .tl-hours span { position: absolute; top: 0; font-size: 11.5px; color: var(--ink-soft); transform: translateX(-50%); white-space: nowrap; }
+  .tl-row { display: flex; align-items: center; gap: 0; border-top: 1px solid var(--rule); }
+  .tl-row:first-of-type { border-top: 1px solid var(--rule-strong); }
+  .tl-name { width: 152px; flex: none; font-size: 13.5px; font-weight: 450; padding-right: 12px; }
+  .tl-name small { display: block; font-weight: 400; font-size: 12px; color: var(--ink-soft); }
+  .tl-track { position: relative; flex: 1; height: 46px; }
+  .tl-track::before, .tl-track::after {
+    content: ''; position: absolute; top: 0; bottom: 0; width: 1px; background: var(--rule);
+  }
+  .tl-track::before { left: 0; }
+  .tl-track::after { right: 0; }
+  .tl-tick { position: absolute; top: 0; bottom: 0; width: 1px; background: var(--rule); }
+  .tl-bar {
+    position: absolute; top: 11px; height: 24px; min-width: 3px;
+    background: var(--teal-4); border-radius: 2px;
+    display: flex; align-items: center; padding: 0 7px; overflow: hidden;
+    color: #fff; font-size: 12px; font-weight: 500; white-space: nowrap;
+  }
+  .tl-bar.flag {
+    background: repeating-linear-gradient(45deg, var(--amber-bg), var(--amber-bg) 5px, #F3E3C4 5px, #F3E3C4 10px);
+    box-shadow: inset 0 0 0 1.5px var(--amber); color: var(--amber);
+  }
+  .tl-empty { color: var(--ink-soft); font-size: 14px; padding: 10px 0 16px; }
+
+  /* ---- drill-down rows ---- */
+  table.data tr.drill { cursor: pointer; }
+  table.data tr.drill:hover { background: var(--teal-1); }
+  table.data tr.drill td:first-child::after { content: ' \203a'; color: var(--teal-4); font-weight: 700; }
+  .crumb { background: none; border: 0; padding: 0; font: inherit; font-size: 13px; color: var(--teal-5); text-decoration: underline; cursor: pointer; }
+  .crumb:hover { color: var(--amber); }
+
+  /* ---- data tables ---- */
+  .tbl-scroll { overflow-x: auto; background: var(--card); border: 1px solid var(--rule); border-radius: 3px; }
+  table.data { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  table.data th {
+    text-align: left; font-weight: 500; font-size: 12.5px; color: var(--ink-soft);
+    padding: 9px 14px; border-bottom: 1px solid var(--rule-strong); white-space: nowrap;
+  }
+  table.data th.num, table.data td.num { text-align: right; }
+  table.data th.sortable { cursor: pointer; user-select: none; }
+  table.data th.sortable:hover { color: var(--teal-5); }
+  table.data th[aria-sort] { color: var(--teal-5); }
+  table.data td { padding: 8px 14px; border-bottom: 1px solid var(--rule); white-space: nowrap; }
+  table.data tbody tr:last-child td { border-bottom: 0; }
+  table.data td.wide { white-space: normal; }
+  .bar-cell { min-width: 118px; }
+  .bar { position: relative; height: 15px; background: var(--teal-1); border-radius: 2px; }
+  .bar i { position: absolute; inset: 0 auto 0 0; background: var(--teal-4); border-radius: 2px; display: block; }
+  .bar-cell b { font-weight: 500; font-size: 12.5px; display: block; margin-bottom: 2px; }
+  table.data tr.unvisited td { color: var(--ink-soft); }
+  table.data tr.unvisited .bar { opacity: .45; }
+  table.data td.never { color: var(--amber); font-weight: 500; }
+  table.data small.ago { display: block; font-size: 11.5px; color: var(--ink-soft); font-weight: 400; }
+  .master-note { margin: 0 0 10px; padding-bottom: 10px; border-bottom: 1px dotted var(--rule); }
+  .master-note strong { color: var(--amber); font-weight: 600; }
+  table.data tr.total td { border-top: 1px solid var(--rule-strong); border-bottom: 0; font-weight: 600; background: var(--paper); }
+  tr.is-flagged { background: var(--amber-bg); }
+  .tag { display: inline-block; font-size: 11.5px; color: var(--amber); border: 1px solid var(--amber); border-radius: 2px; padding: 0 5px; }
+  .name-cell { font-weight: 450; }
+
+  /* ---- states ---- */
+  .msg { border: 1px solid var(--rule-strong); border-radius: 3px; background: var(--card); padding: 18px 20px; margin: 26px 0; }
+  .msg h3 { margin: 0 0 6px; font-size: 15px; font-weight: 600; }
+  .msg p { margin: 0 0 8px; font-size: 14px; color: var(--ink-soft); max-width: 62ch; }
+  .msg.error { border-left: 3px solid var(--amber); }
+  .msg ol { margin: 0 0 10px; padding-left: 20px; font-size: 14px; color: var(--ink-soft); max-width: 62ch; }
+  .msg li { margin-bottom: 5px; }
+  .msg code {
+    font-family: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 13px; background: var(--absent); border: 1px solid var(--rule);
+    border-radius: 2px; padding: 1px 5px; color: var(--ink);
+  }
+  .msg .cmd { display: block; padding: 8px 10px; margin: 6px 0 2px; white-space: pre-wrap; word-break: break-all; }
+  .msg ol.steps { margin: 4px 0 12px; }
+  .msg ol.steps > li { margin-bottom: 12px; color: var(--ink); }
+  .pick-label { margin-top: 14px; }
+  .empty { color: var(--ink-soft); font-size: 14px; padding: 18px 0; }
+  [hidden] { display: none !important; }
+  footer { border-top: 1px solid var(--rule); padding-top: 14px; font-size: 12.5px; color: var(--ink-soft); }
+
+  @media (max-width: 620px) {
+    h1 { font-size: 21px; }
+    .stat b { font-size: 24px; }
+    .stat { flex-basis: 50%; padding: 10px 14px; border-left: 0; border-top: 1px solid var(--rule); }
+    .stat:first-child, .stat:nth-child(2) { border-top: 0; }
+    .masthead-right { margin-left: 0; width: 100%; }
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .mark { transition: background-color .12s ease; }
+  }
+  @media print {
+    body { background: #fff; }
+    .filters, .masthead-right, button { display: none; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="masthead">
+    <h1>Surveyor attendance</h1>
+    <p class="sub">Kanpur Nagar Nigam &middot; NCAP Dispersed Sources Program</p>
+    <div class="masthead-right">
+      <span id="synced">Loading&hellip;</span>
+      <button id="reload" type="button">Refresh data</button>
+    </div>
+  </header>
+
+  <div class="filters" id="filters" hidden>
+    <div class="field">
+      <span>Period</span>
+      <div class="seg" id="mode" role="group" aria-label="Period type">
+        <button type="button" data-mode="all" aria-pressed="true">All time</button>
+        <button type="button" data-mode="day" aria-pressed="false">Day</button>
+        <button type="button" data-mode="week" aria-pressed="false">Week</button>
+        <button type="button" data-mode="month" aria-pressed="false">Month</button>
+        <button type="button" data-mode="quarter" aria-pressed="false">FY quarter</button>
+      </div>
+    </div>
+    <label class="field" id="periodField" hidden>
+      <span id="periodLabel">Select</span>
+      <select id="period"></select>
+    </label>
+    <label class="field">
+      <span>Surveyor</span>
+      <select id="surveyor"><option value="">All surveyors</option></select>
+    </label>
+    <label class="field">
+      <span>Zone</span>
+      <select id="zone"><option value="">All zones</option></select>
+    </label>
+    <div class="field">
+      <span>&nbsp;</span>
+      <button id="download" type="button">Download summary</button>
+    </div>
+  </div>
+
+  <div class="msg error" id="error" hidden>
+    <h3 id="errorTitle">Could not load the response sheet</h3>
+    <p id="errorBody"></p>
+    <div id="errorFix"></div>
+    <p class="pick-label">Or load a CSV you have downloaded:</p>
+    <input type="file" id="filePick" accept=".csv,text/csv">
+  </div>
+
+  <div id="app" hidden>
+    <div class="stats" id="stats"></div>
+
+    <section id="musterSection">
+      <h2>Daily muster</h2>
+      <p class="note">One column per day. Darker means a longer logged shift; outlined cells need a time correction.</p>
+      <div class="grid-scroll"><table class="muster" id="muster"></table></div>
+      <div class="legend">
+        <span>Not logged</span><span class="mark"></span>
+        <span class="gap"></span>
+        <span>Under 2 h</span>
+        <span class="mark h1"></span><span class="mark h2"></span><span class="mark h3"></span><span class="mark h4"></span><span class="mark h5"></span>
+        <span>Over 8 h</span>
+        <span class="gap"></span>
+        <span class="mark flag"></span><span>Needs checking</span>
+      </div>
+    </section>
+
+    <section id="timelineSection" hidden>
+      <h2 id="timelineHeading">Shifts on the day</h2>
+      <p class="note">Each bar runs from the submitted start time to the end time. Hatched bars have times that need correcting.</p>
+      <div id="timeline"></div>
+    </section>
+
+    <section>
+      <h2 id="coverageHeading">Coverage by zone</h2>
+      <p class="note" id="coverageNote"></p>
+      <div class="tbl-scroll"><table class="data" id="coverage"></table></div>
+    </section>
+
+    <section>
+      <h2>Performance by surveyor</h2>
+      <p class="note">Click a column heading to sort.</p>
+      <div class="tbl-scroll"><table class="data" id="summary"></table></div>
+    </section>
+
+    <section>
+      <h2>Entry log</h2>
+      <p class="note" id="logNote"></p>
+      <div class="tbl-scroll"><table class="data" id="log"></table></div>
+    </section>
+
+    <footer>
+      <p id="masterNote" class="master-note"></p>
+      Hours come from the submitted start and end times. Where an end time falls before its start time or a shift
+      runs past 12 hours, the duration is treated as unverified: it is shown in the log but left out of hour totals
+      and averages, so one mistyped time cannot skew a surveyor's record. Tickets and distance from those entries
+      still count. Ask the surveyor to resubmit, and the numbers correct themselves on the next refresh.
+      A submission may list several wards; those are counted as one visit each, and its tickets and
+      distance stay with the submission rather than being split across them, so the ward table shows
+      visits only.
+    </footer>
+  </div>
+</div>
+
+<script>
+/* ==========================================================================
+   CONFIG
+   ========================================================================== */
+const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRTuhd4_d6dJSNRPi8RWyyC5tPjiTu4ZlVcfNB-lM3PPESYho3WukxlfPdpaivkyAFQDuf1b82stp3w/pub?gid=2126902011&single=true&output=csv";
+
+// Optional second endpoint, tried only if the one above fails. To use it, take
+// the sheet's own ID from its edit URL (docs.google.com/spreadsheets/d/ID/edit),
+// set sharing to "Anyone with the link can view", and fill in ID and the gid:
+// "https://docs.google.com/spreadsheets/d/ID/gviz/tq?tqx=out:csv&gid=1736756042"
+const ALT_CSV_URL = "";
+
+// ---- Ward master list -----------------------------------------------------
+// Kanpur has no published zone-ward mapping yet, so this is empty and the ward
+// view lists only wards that were actually surveyed. Publish a mapping tab
+// (File > Share > Publish to web > that tab > CSV) with two columns, zone and
+// ward, put its URL here, and never-surveyed wards start appearing as zero
+// rows -- which is what turns activity reporting into coverage reporting.
+const WARD_MAP_URL = "";
+
+// Offline copy of that mapping, used only if the URL above cannot be reached.
+const WARD_MAP_BUILTIN = ``;
+
+/* ==========================================================================
+   HELPERS
+   ========================================================================== */
+const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const DOW = ['M','T','W','T','F','S','S'];
+const FULLDOW = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+const pad = (n) => String(n).padStart(2, '0');
+const el = (id) => document.getElementById(id);
+const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[c]));
+
+function parseCSV(text) {
+  const rows = [];
+  let row = [], val = '', q = false;
+  text = text.replace(/^\uFEFF/, '');
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i];
+    if (q) {
+      if (c === '"') { if (text[i + 1] === '"') { val += '"'; i++; } else q = false; }
+      else val += c;
+    } else if (c === '"') q = true;
+    else if (c === ',') { row.push(val); val = ''; }
+    else if (c === '\n' || c === '\r') {
+      if (c === '\r' && text[i + 1] === '\n') i++;
+      row.push(val); rows.push(row); row = []; val = '';
+    } else val += c;
+  }
+  if (val !== '' || row.length) { row.push(val); rows.push(row); }
+  return rows.filter((r) => r.some((c) => String(c).trim() !== ''));
+}
+
+const parseDMY = (s) => {
+  const m = String(s || '').trim().match(/^(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{4})/);
+  if (!m) return null;
+  const d = new Date(+m[3], +m[2] - 1, +m[1]);
+  return isNaN(d) ? null : d;
+};
+const parseClock = (s) => {
+  const t = String(s || '').trim();
+  const m = t.match(/^(\d{1,2}):(\d{2})/);
+  if (!m) return null;
+  let h = +m[1];
+  if (/pm/i.test(t) && h < 12) h += 12;
+  if (/am/i.test(t) && h === 12) h = 0;
+  return h * 60 + (+m[2]);
+};
+const parseNum = (s) => {
+  const m = String(s || '').replace(/,/g, '').match(/\d+(\.\d+)?/);
+  return m ? parseFloat(m[0]) : null;
+};
+const hhmm = (mins) => mins == null ? '—' : Math.floor(mins / 60) + ':' + pad(Math.round(mins % 60));
+const clock = (mins) => mins == null ? '—' : pad(Math.floor(mins / 60)) + ':' + pad(mins % 60);
+const num = (v, dp = 1) => v == null ? '—' : v.toLocaleString('en-IN', { minimumFractionDigits: dp, maximumFractionDigits: dp });
+
+const fyStart = (d) => d.getMonth() >= 3 ? d.getFullYear() : d.getFullYear() - 1;
+const fyQ = (d) => Math.floor(((d.getMonth() + 9) % 12) / 3) + 1;
+const dayKey = (d) => d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+const weekStart = (d) => {
+  const x = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  x.setDate(x.getDate() - ((x.getDay() + 6) % 7));
+  return x;
+};
+const shortDate = (d) => d.getDate() + ' ' + MONTHS[d.getMonth()];
+
+function periodOf(d, mode) {
+  if (mode === 'day') return { key: dayKey(d), label: pad(d.getDate()) + ' ' + MONTHS[d.getMonth()] + ' ' + d.getFullYear() + ' (' + FULLDOW[(d.getDay() + 6) % 7] + ')' };
+  if (mode === 'month') return { key: d.getFullYear() + '-' + pad(d.getMonth() + 1), label: MONTHS[d.getMonth()] + ' ' + d.getFullYear() };
+  if (mode === 'quarter') {
+    const s = fyStart(d);
+    return { key: s + '-Q' + fyQ(d), label: 'Q' + fyQ(d) + '  FY ' + s + '\u2013' + pad((s + 1) % 100) };
+  }
+  if (mode === 'week') {
+    const a = weekStart(d), b = new Date(a); b.setDate(a.getDate() + 6);
+    return { key: dayKey(a), label: shortDate(a) + ' \u2013 ' + shortDate(b) };
+  }
+  return { key: 'all', label: 'All time' };
+}
+
+/* ==========================================================================
+   WARD MASTER LIST
+   ========================================================================== */
+// Match on a squashed key so "Faizullaganj-2", "Faizullaganj 2" and
+// "faizullaganj2" all resolve to one ward. Transliteration differences
+// ("Shashtri" vs "Shastri") cannot be matched safely and are reported instead.
+const nameKey = (s) => String(s || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+
+// The Kanpur form lets one submission cover several wards ("16, 20"), so every
+// ward cell is a list. Tickets and distance are recorded per submission, not
+// per ward, which is why the ward view counts visits and never splits them.
+const splitWards = (s) => String(s || '')
+  .split(/[,;/&]|\band\b/i)
+  .map((w) => w.trim().replace(/^ward\s*/i, '').replace(/\.$/, ''))
+  .filter(Boolean);
+const zoneKey = (s) => {
+  const m = String(s || '').match(/(\d+)/);
+  return m ? 'zone' + Number(m[1]) : nameKey(s);
+};
+const zoneLabel = (s) => {
+  const m = String(s || '').match(/(\d+)/);
+  return m ? 'Zone ' + Number(m[1]) : String(s || '').trim();
+};
+
+let WARD_MASTER = new Map();     // wardKey  -> { zoneKey, zone, ward }
+let ZONE_WARDS = new Map();      // zoneKey  -> [{ ward, wardKey }]
+let MASTER_SOURCE = 'built-in list';
+let MASTER_WARNING = '';
+
+function loadWardMaster(text, source) {
+  const rows = parseCSV(text);
+  if (!rows.length) return false;
+
+  // Locate the columns by header name rather than assuming A and B.
+  const head = rows[0].map((h) => String(h || '').trim().toLowerCase());
+  const zi = head.findIndex((h) => /\bzone\b/.test(h));
+  const wi = head.findIndex((h) => /\bward\b/.test(h));
+
+  // The responses tab also has Zone and Ward columns, so header presence alone
+  // cannot tell the two sheets apart. Response-only columns are the giveaway.
+  if (head.some((h) => /timestamp|start time|end time|ticket|distance/.test(h))) {
+    MASTER_WARNING = 'That URL points at the form responses tab, not the Zone-ward mapping tab, so the built-in list is still in use. In Publish to web, pick the mapping tab from the dropdown and copy that link.';
+    return false;
+  }
+  if (zi < 0 || wi < 0) {
+    MASTER_WARNING = 'The ward mapping URL did not return a sheet with Zone and Ward columns, so the built-in list is still in use.';
+    return false;
+  }
+
+  const master = new Map(), byZone = new Map();
+  for (let i = 1; i < rows.length; i++) {
+    const z = (rows[i][zi] || '').trim(), w = (rows[i][wi] || '').trim();
+    if (!z || !w) continue;                        // skip the blank separator rows
+    const zk = zoneKey(z), wk = nameKey(w);
+    if (!wk || master.has(wk)) continue;           // first spelling wins
+    master.set(wk, { zoneKey: zk, zone: zoneLabel(z), ward: w });
+    if (!byZone.has(zk)) byZone.set(zk, []);
+    byZone.get(zk).push({ ward: w, wardKey: wk });
+  }
+  if (!master.size) {
+    MASTER_WARNING = 'The ward mapping URL returned no usable zone and ward rows, so the built-in list is still in use.';
+    return false;
+  }
+  WARD_MASTER = master;
+  ZONE_WARDS = byZone;
+  MASTER_SOURCE = source;
+  MASTER_WARNING = '';
+  return true;
+}
+
+/* ==========================================================================
+   STATE
+   ========================================================================== */
+let ENTRIES = [];
+const state = { mode: 'all', period: '', surveyor: '', zone: '', sort: 'name', dir: 1, covSort: 'tickets', covDir: 1, covDrilled: false };
+
+/* ==========================================================================
+   LOAD
+   ========================================================================== */
+function normalize(rows) {
+  const head = rows[0].map((h) => h.trim().toLowerCase());
+  const col = (...names) => {
+    for (const n of names) {
+      const i = head.indexOf(n);
+      if (i > -1) return i;
+    }
+    return -1;
+  };
+  const ix = {
+    date: col('date'), name: col('name', 'surveyor', 'surveyor name'),
+    start: col('start time', 'start'), end: col('end time', 'end'),
+    zone: col('zone'), ward: col('ward'),
+    tickets: col('number of tickets', 'no. of tickets raised', 'no of tickets raised',
+                  'no. of tickets', 'tickets raised', 'tickets'),
+    dist: col('distance covered', 'distance')
+  };
+  if (ix.date < 0 || ix.name < 0) throw new Error('The sheet needs at least a Date and a Name column.');
+
+  const out = [];
+  for (let r = 1; r < rows.length; r++) {
+    const row = rows[r];
+    const date = parseDMY(row[ix.date]);
+    const name = (row[ix.name] || '').trim();
+    if (!date || !name) continue;
+    const start = parseClock(row[ix.start]);
+    const end = parseClock(row[ix.end]);
+    let mins = null, flag = null;
+    if (start == null || end == null) flag = 'Missing time';
+    else {
+      mins = end - start;
+      if (mins < 0) { mins += 1440; flag = 'End before start'; }
+      if (mins === 0) flag = 'Zero-length shift';
+      else if (mins > 720) flag = flag || 'Over 12 hours';
+    }
+    const rawZone = (row[ix.zone] || '').trim();
+    const rawWard = (row[ix.ward] || '').trim();
+    const wards = splitWards(rawWard).map((w) => {
+      const k = nameKey(w);
+      const m = WARD_MASTER.get(k);
+      return { ward: m ? m.ward : w, wardKey: k, unmatched: !m };
+    });
+    // Zone comes from the row itself; the master list is only consulted to
+    // normalise spellings when one is loaded.
+    const known = wards.length ? WARD_MASTER.get(wards[0].wardKey) : null;
+    out.push({
+      date, dayKey: dayKey(date), name,
+      start, end, mins, flag,
+      // A flagged duration is unreliable, so it is shown but never counted.
+      validMins: flag ? null : mins,
+      // Prefer the master list's spelling so variants collapse into one ward.
+      zone: known ? known.zone : zoneLabel(rawZone),
+      zoneKey: known ? known.zoneKey : zoneKey(rawZone),
+      wards, wardRaw: rawWard,
+      wardUnmatched: wards.some((w) => w.unmatched) && WARD_MASTER.size > 0,
+      tickets: parseNum(row[ix.tickets]) ?? 0,
+      dist: parseNum(row[ix.dist])
+    });
+  }
+  // Surveyors type their own name into the form, so 'suraj' and 'Suraj' arrive
+  // as two people and split every table and muster row. Collapse them onto one
+  // spelling: the most frequent, preferring a capitalised one when tied.
+  const spellings = new Map();
+  for (const e of out) {
+    const k = nameKey(e.name);
+    const seen = spellings.get(k) || new Map();
+    seen.set(e.name, (seen.get(e.name) || 0) + 1);
+    spellings.set(k, seen);
+  }
+  const canonical = new Map();
+  for (const [k, seen] of spellings) {
+    const top = [...seen.entries()].sort((a, b) =>
+      b[1] - a[1] ||
+      (a[0] === a[0].toLowerCase() ? 1 : 0) - (b[0] === b[0].toLowerCase() ? 1 : 0) ||
+      a[0].localeCompare(b[0]))[0][0];
+    canonical.set(k, top);
+  }
+  for (const e of out) {
+    e.nameRaw = e.name;
+    e.name = canonical.get(nameKey(e.name)) || e.name;
+  }
+
+  out.sort((a, b) => a.date - b.date || a.name.localeCompare(b.name));
+  return out;
+}
+
+async function load() {
+  el('synced').textContent = 'Loading\u2026';
+  el('error').hidden = true;
+  el('errorFix').innerHTML = '';
+
+  // Ward master first, so response rows can be matched against it as they parse.
+  if (WARD_MAP_BUILTIN.trim()) loadWardMaster(WARD_MAP_BUILTIN, 'built-in list');
+  if (WARD_MAP_URL) {
+    try {
+      const r = await fetch(WARD_MAP_URL, { cache: 'no-store' });
+      if (!r.ok) MASTER_WARNING = 'The ward mapping URL returned HTTP ' + r.status + '; the built-in list is still in use.';
+      else {
+        const t = await r.text();
+        if (/^\s*</.test(t)) MASTER_WARNING = 'The ward mapping URL returned a web page rather than CSV; the built-in list is still in use.';
+        else loadWardMaster(t, 'published mapping sheet');
+      }
+    } catch (e) {
+      MASTER_WARNING = 'The ward mapping sheet could not be reached; the built-in list is still in use.';
+    }
+  }
+
+  // Try the plain published URL first, then a cache-busted variant, then the
+  // optional alternate endpoint. Some setups reject unknown query parameters.
+  const tries = [CSV_URL, CSV_URL + '&t=' + Date.now()];
+  if (ALT_CSV_URL) tries.push(ALT_CSV_URL);
+
+  let last = null;
+  for (const url of tries) {
+    try {
+      const res = await fetch(url, { cache: 'no-store', redirect: 'follow' });
+      if (!res.ok) { last = new Error('The sheet returned HTTP ' + res.status + '.'); continue; }
+      const text = await res.text();
+      if (/^\s*</.test(text)) { last = new Error('The URL returned a web page, not CSV. Re-copy the published CSV link.'); continue; }
+      ingest(text);
+      return;
+    } catch (err) { last = err; }
+  }
+  showError(last);
+}
+
+function showError(err) {
+  el('synced').textContent = 'Not loaded';
+  const msg = (err && err.message) || String(err);
+  const blocked = /failed to fetch|load failed|networkerror|cors/i.test(msg);
+  el('errorBody').textContent = blocked
+    ? 'The browser blocked the request before it reached Google (' + msg + '). The sheet itself is almost certainly fine.'
+    : msg;
+
+  let fix = '';
+  if (blocked && location.protocol === 'file:') {
+    const file = decodeURIComponent(location.pathname.split('/').pop() || 'index.html');
+    el('errorTitle').textContent = 'Open this page through a local server';
+    fix = '<p>The page is open as a local file, so it has no web origin and the browser will not let it ' +
+      'request the sheet. Two steps:</p>' +
+      '<ol class="steps">' +
+      '<li>In a terminal, go to the folder holding this file and start a server:' +
+      '<code class="cmd">python -m http.server 8000</code></li>' +
+      '<li>Leave that running, and open this address in your browser:' +
+      '<code class="cmd">http://localhost:8000/' + esc(file) + '</code></li>' +
+      '</ol>' +
+      '<p>On Windows use <code>py -m http.server 8000</code> if <code>python</code> is not recognised. ' +
+      'Once the page is hosted anywhere as a normal web page, none of this applies.</p>';
+  } else if (blocked) {
+    el('errorTitle').textContent = 'The sheet request was blocked';
+    fix = '<ol>' +
+      '<li>Open the CSV link directly in a new tab. If it downloads or displays rows, the sheet is published correctly.</li>' +
+      '<li>Try a private window &mdash; ad blockers and privacy extensions block Google Docs requests on some pages.</li>' +
+      '<li>If your network filters Google Docs, use the file picker below, or set <code>ALT_CSV_URL</code> near the top of this file to the sheet&rsquo;s <code>gviz/tq?tqx=out:csv</code> link.</li>' +
+      '</ol>';
+  } else {
+    el('errorTitle').textContent = 'Could not load the response sheet';
+    fix = '<p>Check that the sheet is still published to the web: File &rsaquo; Share &rsaquo; Publish to web, ' +
+      'choose the response tab, and pick Comma-separated values.</p>';
+  }
+  el('errorFix').innerHTML = fix;
+  el('error').hidden = false;
+}
+
+function ingest(text, source) {
+  ENTRIES = normalize(parseCSV(text));
+  if (!ENTRIES.length) throw new Error('No usable rows found in the sheet.');
+  el('synced').textContent = (source || 'Updated ') + new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+  el('filters').hidden = false;
+  el('app').hidden = false;
+  el('error').hidden = true;
+  fillSelect('surveyor', [...new Set(ENTRIES.map((e) => e.name))].sort((a, b) => a.localeCompare(b)), 'All surveyors');
+  fillSelect('zone', [...new Set(ENTRIES.map((e) => e.zone).filter(Boolean))].sort((a, b) => a.localeCompare(b, undefined, { numeric: true })), 'All zones');
+  const unmatched = [...new Set(ENTRIES.filter((e) => e.wardUnmatched)
+    .flatMap((e) => e.wards.filter((w) => w.unmatched).map((w) => w.ward)))].sort();
+  el('masterNote').innerHTML = (WARD_MASTER.size
+      ? 'Ward list: ' + esc(MASTER_SOURCE) + ', ' + WARD_MASTER.size + ' wards across ' +
+        ZONE_WARDS.size + ' zones.'
+      : 'No zone-ward mapping is configured, so the ward view lists only wards that ' +
+        'were surveyed. Wards nobody has visited cannot be shown until a mapping ' +
+        'sheet is published and set as WARD_MAP_URL.') +
+    (MASTER_WARNING ? ' <strong>' + esc(MASTER_WARNING) + '</strong>' : '') +
+    (WARD_MASTER.size && unmatched.length
+      ? ' <strong>' + unmatched.length + ' ward name' + (unmatched.length === 1 ? '' : 's') +
+        ' in the responses did not match it:</strong> ' + esc(unmatched.join('; ')) +
+        '. These are counted, but shown separately from their zone\u2019s master wards.'
+      : WARD_MASTER.size ? ' Every ward name in the responses matched.' : '');
+  refreshPeriods();
+  render();
+}
+
+function fillSelect(id, values, allLabel) {
+  const s = el(id), keep = s.value;
+  s.innerHTML = '<option value="">' + allLabel + '</option>' +
+    values.map((v) => '<option value="' + esc(v) + '">' + esc(v) + '</option>').join('');
+  if (values.includes(keep)) s.value = keep;
+}
+
+function refreshPeriods() {
+  const f = el('periodField');
+  if (state.mode === 'all') { f.hidden = true; state.period = ''; return; }
+  f.hidden = false;
+  el('periodLabel').textContent = { day: 'Date', month: 'Month', week: 'Week beginning Monday', quarter: 'Quarter' }[state.mode];
+  const seen = new Map();
+  for (const e of ENTRIES) {
+    const p = periodOf(e.date, state.mode);
+    if (!seen.has(p.key)) seen.set(p.key, p.label);
+  }
+  const keys = [...seen.keys()].sort().reverse();
+  el('period').innerHTML = keys.map((k) => '<option value="' + esc(k) + '">' + esc(seen.get(k)) + '</option>').join('');
+  state.period = keys.includes(state.period) ? state.period : keys[0];
+  el('period').value = state.period;
+}
+
+/* ==========================================================================
+   RENDER
+   ========================================================================== */
+function periodBounds() {
+  if (state.mode === 'all' || state.mode === 'day' || !state.period) return null;
+  if (state.mode === 'week') {
+    const [y, m, d] = state.period.split('-').map(Number);
+    return { from: new Date(y, m - 1, d), to: new Date(y, m - 1, d + 6) };
+  }
+  if (state.mode === 'month') {
+    const [y, m] = state.period.split('-').map(Number);
+    return { from: new Date(y, m - 1, 1), to: new Date(y, m, 0) };
+  }
+  if (state.mode === 'quarter') {
+    const [y, q] = state.period.split('-Q').map(Number);
+    const startMonth = [3, 6, 9, 0][q - 1];          // Apr, Jul, Oct, Jan
+    const startYear = q === 4 ? y + 1 : y;           // Q4 falls in the next calendar year
+    return { from: new Date(startYear, startMonth, 1), to: new Date(startYear, startMonth + 3, 0) };
+  }
+  return null;
+}
+
+function filtered() {
+  return ENTRIES.filter((e) =>
+    (state.mode === 'all' || periodOf(e.date, state.mode).key === state.period) &&
+    (!state.surveyor || e.name === state.surveyor) &&
+    (!state.zone || e.zone === state.zone));
+}
+
+function render() {
+  const rows = filtered();
+  const isDay = state.mode === 'day';
+  el('musterSection').hidden = isDay;
+  el('timelineSection').hidden = !isDay;
+  renderStats(rows);
+  if (isDay) renderTimeline(rows); else renderMuster(rows);
+  renderCoverage(rows);
+  renderSummary(rows);
+  renderLog(rows);
+}
+
+function renderTimeline(rows) {
+  const box = el('timeline');
+  el('timelineHeading').textContent = 'Shifts on ' + (el('period').selectedOptions[0] || {}).textContent;
+  if (!rows.length) { box.innerHTML = '<p class="tl-empty">No entries logged on this date.</p>'; return; }
+
+  // Domain: whole hours spanning every submitted time, at least 6 hours wide.
+  let lo = 24 * 60, hi = 0;
+  for (const e of rows) {
+    for (const t of [e.start, e.end]) {
+      if (t == null) continue;
+      lo = Math.min(lo, t); hi = Math.max(hi, t);
+    }
+  }
+  if (hi <= lo) { lo = 8 * 60; hi = 18 * 60; }
+  lo = Math.max(0, Math.floor(lo / 60) * 60 - 30);
+  hi = Math.min(1440, Math.ceil(hi / 60) * 60 + 30);
+  if (hi - lo < 360) hi = Math.min(1440, lo + 360);
+  const span = hi - lo;
+  const pct = (m) => ((m - lo) / span) * 100;
+
+  // Hour ruler, thinned out so labels never collide.
+  const step = span > 720 ? 180 : span > 480 ? 120 : 60;
+  let ruler = '', ticks = '';
+  for (let m = Math.ceil(lo / step) * step; m <= hi; m += step) {
+    ruler += '<span style="left:' + pct(m).toFixed(2) + '%">' + pad(Math.floor(m / 60)) + ':00</span>';
+    ticks += '<div class="tl-tick" style="left:' + pct(m).toFixed(2) + '%"></div>';
+  }
+
+  const names = [...new Set(rows.map((e) => e.name))].sort((a, b) => a.localeCompare(b));
+  let html = '<div class="tl"><div class="tl-hours">' + ruler + '</div>';
+  for (const n of names) {
+    const mine = rows.filter((e) => e.name === n);
+    const tk = mine.reduce((a, e) => a + e.tickets, 0);
+    const km = mine.reduce((a, e) => a + (e.dist || 0), 0);
+    html += '<div class="tl-row"><div class="tl-name">' + esc(n) +
+      '<small>' + tk + ' tickets \u00b7 ' + num(km, 0) + ' km</small></div><div class="tl-track">' + ticks;
+    for (const e of mine) {
+      if (e.start == null && e.end == null) continue;
+      const a = Math.min(e.start ?? e.end, e.end ?? e.start);
+      const b = Math.max(e.start ?? e.end, e.end ?? e.start);
+      const left = pct(a), width = Math.max(0.6, pct(b) - pct(a));
+      const label = e.flag ? 'check times' : hhmm(e.mins) + ' h';
+      const tip = clock(e.start) + ' \u2013 ' + clock(e.end) + (e.flag ? ' \u2014 ' + e.flag : ', ' + hhmm(e.mins) + ' hours') +
+        ' \u00b7 ' + (e.zone || 'zone not given') + ', ' + (e.wardRaw || 'ward not given') +
+        ' \u00b7 ' + e.tickets + ' tickets, ' + num(e.dist, 0) + ' km';
+      html += '<div class="tl-bar' + (e.flag ? ' flag' : '') + '" style="left:' + left.toFixed(2) + '%;width:' +
+        width.toFixed(2) + '%" title="' + esc(tip) + '">' + esc(label) + '</div>';
+    }
+    html += '</div></div>';
+  }
+  box.innerHTML = html + '</div>';
+}
+
+const ZONE_COLS = [
+  { k: 'label', t: 'Zone' }, { k: 'tickets', t: 'Tickets', num: true, bar: true, dp: 0 },
+  { k: 'coverage', t: 'Wards covered', num: true, frac: true },
+  { k: 'visits', t: 'Visits', num: true },
+  { k: 'surveyors', t: 'Surveyors', num: true }, { k: 'hours', t: 'Hours', num: true, dp: 1 },
+  { k: 'dist', t: 'Km', num: true, dp: 0 },
+  { k: 'lastSeen', t: 'Last surveyed', date: true }
+];
+// No tickets, hours or km here on purpose: a submission covering two wards
+// records one ticket count for both, so attributing it to each ward would
+// double-count and the column would not reconcile with the zone total.
+const WARD_COLS = [
+  { k: 'label', t: 'Ward' },
+  { k: 'visits', t: 'Visits', num: true, bar: true },
+  { k: 'surveyors', t: 'Surveyors', num: true },
+  { k: 'days', t: 'Days', num: true },
+  { k: 'lastSeen', t: 'Last surveyed', date: true }
+];
+
+const startOfToday = () => { const t = new Date(); return new Date(t.getFullYear(), t.getMonth(), t.getDate()); };
+const daysAgo = (d) => Math.round((startOfToday() - new Date(d.getFullYear(), d.getMonth(), d.getDate())) / 86400000);
+
+function lastSeenCell(d) {
+  if (!d) return '<td class="never">Never surveyed</td>';
+  const n = daysAgo(d);
+  const when = n === 0 ? 'today' : n === 1 ? 'yesterday' : n + ' days ago';
+  return '<td>' + pad(d.getDate()) + ' ' + MONTHS[d.getMonth()] + ' ' + d.getFullYear() +
+    '<small class="ago">' + when + '</small></td>';
+}
+
+function groupBy(rows, keyOf, labelOf) {
+  const by = new Map();
+  for (const e of rows) {
+    const key = keyOf(e) || '\u0000none';
+    const g = by.get(key) || {
+      key, label: labelOf(e) || '(not recorded)', tickets: 0, dist: 0, mins: 0, timed: false,
+      visits: 0, wards: new Set(), people: new Set(), lastSeen: null, unmatched: false
+    };
+    g.tickets += e.tickets; g.dist += e.dist || 0; g.visits++;
+    if (e.validMins != null) { g.mins += e.validMins; g.timed = true; }
+    for (const w of e.wards) g.wards.add(w.wardKey);
+    if (e.wardUnmatched) g.unmatched = true;
+    g.people.add(e.name);
+    if (!g.lastSeen || e.date > g.lastSeen) g.lastSeen = e.date;
+    by.set(key, g);
+  }
+  return [...by.values()].map((g) => ({
+    key: g.key, label: g.label, tickets: g.tickets, dist: g.dist,
+    hours: g.timed ? g.mins / 60 : null,
+    visits: g.visits, wardsSeen: g.wards.size, surveyors: g.people.size,
+    lastSeen: g.lastSeen, unmatched: g.unmatched
+  }));
+}
+
+function coverageData(rows, drilled) {
+  if (drilled) {
+    const zk = zoneKey(state.zone);
+    // One visit per (submission, ward) pair, counted without splitting the
+    // submission's tickets or distance across the wards it names.
+    const by = new Map();
+    for (const e of rows) {
+      for (const w of e.wards) {
+        const g = by.get(w.wardKey) || {
+          key: w.wardKey, label: w.ward, visits: 0,
+          people: new Set(), days: new Set(), lastSeen: null
+        };
+        g.visits++; g.people.add(e.name); g.days.add(e.dayKey);
+        if (!g.lastSeen || e.date > g.lastSeen) g.lastSeen = e.date;
+        by.set(w.wardKey, g);
+      }
+    }
+    const data = [...by.values()].map((g) => ({
+      key: g.key, label: g.label, visits: g.visits,
+      surveyors: g.people.size, days: g.days.size,
+      tickets: 0, dist: 0, hours: null, wardsSeen: 0, lastSeen: g.lastSeen, unmatched: false
+    }));
+    const seen = new Set(data.map((d) => d.key));
+    // Add master-list wards nobody has surveyed yet — the point of the exercise.
+    const known = ZONE_WARDS.get(zk) || [];
+    for (const w of known) {
+      if (!seen.has(w.wardKey)) {
+        data.push({
+          key: w.wardKey, label: w.ward, tickets: 0, dist: 0, hours: null,
+          visits: 0, wardsSeen: 0, surveyors: 0, days: 0, lastSeen: null, unmatched: false
+        });
+      }
+    }
+    return { data, total: known.length, haveMaster: known.length > 0 };
+  }
+  const data = groupBy(rows, (e) => e.zoneKey, (e) => e.zone);
+  for (const d of data) d.wardTotal = (ZONE_WARDS.get(d.key) || []).length;
+  return { data, haveMaster: ZONE_WARDS.size > 0 };
+}
+
+function sortCoverage(data, cols) {
+  const k = state.covSort, dir = state.covDir;
+  data.sort((a, b) => {
+    if (k === 'label') return a.label.localeCompare(b.label, undefined, { numeric: true }) * dir;
+    if (k === 'lastSeen') {
+      // Never-surveyed wards sort as the oldest possible date.
+      const x = a.lastSeen ? a.lastSeen.getTime() : -Infinity;
+      const y = b.lastSeen ? b.lastSeen.getTime() : -Infinity;
+      return (x - y) * dir || a.label.localeCompare(b.label, undefined, { numeric: true });
+    }
+    if (k === 'coverage') {
+      const x = a.wardTotal ? a.wardsSeen / a.wardTotal : -1;
+      const y = b.wardTotal ? b.wardsSeen / b.wardTotal : -1;
+      return (y - x) * dir;
+    }
+    return (((b[k] ?? -1) - (a[k] ?? -1)) * dir) || a.label.localeCompare(b.label, undefined, { numeric: true });
+  });
+  return data;
+}
+
+function renderCoverage(rows) {
+  const t = el('coverage');
+  const drilled = !!state.zone;
+  const cols = drilled ? WARD_COLS : ZONE_COLS;
+  const { data, total, haveMaster } = coverageData(rows, drilled);
+
+  if (state.covDrilled !== drilled) {          // sensible default per view
+    state.covDrilled = drilled;
+    state.covSort = drilled ? 'lastSeen' : 'tickets';
+    state.covDir = 1;
+  }
+
+  el('coverageHeading').textContent = drilled ? 'Wards in ' + state.zone : 'Coverage by zone';
+  const seenCount = data.filter((d) => d.visits > 0).length;
+  let note = drilled
+    ? (haveMaster
+        ? seenCount + ' of ' + total + ' wards surveyed in this period. Oldest first — never-surveyed wards at the top.'
+        : 'No master ward list for this zone, so only surveyed wards are listed.')
+    : 'Tickets raised in each zone. Click a zone to see its wards.';
+  if (drilled) note += ' <button class="crumb" id="clearZone" type="button">Show all zones</button>';
+  el('coverageNote').innerHTML = note;
+
+  if (!data.length) {
+    t.innerHTML = '<tbody><tr><td class="empty" style="padding:18px">No entries match these filters.</td></tr></tbody>';
+  } else {
+    sortCoverage(data, cols);
+    const maxTk = Math.max(...data.map((d) => d.tickets), 1);
+    let html = '<thead><tr>' + cols.map((c) =>
+      '<th class="sortable' + (c.num || c.date ? ' num' : '') + '" data-c="' + c.k + '"' +
+      (state.covSort === c.k ? ' aria-sort="' + (state.covDir === 1 ? 'descending' : 'ascending') + '"' : '') +
+      '>' + c.t + '</th>').join('') + '</tr></thead><tbody>';
+    for (const d of data) {
+      const clickable = !drilled && d.label !== '(not recorded)';
+      const cls = [clickable ? 'drill' : '', d.visits === 0 ? 'unvisited' : ''].filter(Boolean).join(' ');
+      html += '<tr' + (cls ? ' class="' + cls + '"' : '') + (clickable ? ' data-zone="' + esc(d.label) + '"' : '') + '>';
+      for (const c of cols) {
+        if (c.k === 'label') {
+          html += '<td class="name-cell">' + esc(d.label) +
+            (d.unmatched && !drilled ? ' <span class="tag">ward names to check</span>' : '') + '</td>';
+          continue;
+        }
+        if (c.date) { html += lastSeenCell(d.lastSeen); continue; }
+        if (c.frac) {
+          html += '<td class="num">' + (d.wardTotal ? d.wardsSeen + ' / ' + d.wardTotal : d.wardsSeen + ' / ?') + '</td>';
+          continue;
+        }
+        if (c.bar) {
+          const w = Math.max(2, Math.round(d[c.k] / maxTk * 100));
+          html += '<td class="bar-cell"><b>' + num(d[c.k], c.dp) + '</b><div class="bar"><i style="width:' + w + '%"></i></div></td>';
+          continue;
+        }
+        html += '<td class="num">' + num(d[c.k], c.dp ?? 0) + '</td>';
+      }
+      html += '</tr>';
+    }
+    const sum = (k) => data.reduce((a, d) => a + (d[k] || 0), 0);
+    html += '<tr class="total"><td>Total</td>';
+    for (const c of cols.slice(1)) {
+      if (c.date) { html += '<td></td>'; continue; }
+      if (c.frac) {
+        const tot = data.reduce((a, d) => a + (d.wardTotal || 0), 0);
+        html += '<td class="num">' + new Set(rows.map((e) => e.wardKey).filter(Boolean)).size + ' / ' + (tot || '?') + '</td>';
+        continue;
+      }
+      const v = c.k === 'surveyors' ? new Set(rows.map((e) => e.name)).size
+        : c.k === 'hours' ? (rows.some((e) => e.validMins != null)
+            ? rows.reduce((a, e) => a + (e.validMins || 0), 0) / 60 : null)
+        : sum(c.k);
+      html += '<td class="num">' + num(v, c.dp ?? 0) + '</td>';
+    }
+    t.innerHTML = html + '</tr></tbody>';
+  }
+
+  t.querySelectorAll('tr.drill').forEach((tr) => tr.addEventListener('click', () => {
+    state.zone = tr.dataset.zone;
+    el('zone').value = state.zone;
+    render();
+  }));
+  t.querySelectorAll('th.sortable').forEach((th) => th.addEventListener('click', () => {
+    const k = th.dataset.c;
+    if (state.covSort === k) state.covDir *= -1;
+    else { state.covSort = k; state.covDir = k === 'label' || k === 'lastSeen' ? 1 : 1; }
+    renderCoverage(filtered());
+  }));
+  const clear = el('clearZone');
+  if (clear) clear.addEventListener('click', () => { state.zone = ''; el('zone').value = ''; render(); });
+}
+
+function renderStats(rows) {
+  const dates = new Set(rows.map((e) => e.dayKey));                       // calendar days
+  const surveyorDays = new Set(rows.map((e) => e.name + '|' + e.dayKey)); // one per surveyor per day
+  const timedDays = new Set(rows.filter((e) => e.validMins != null).map((e) => e.name + '|' + e.dayKey));
+  const people = new Set(rows.map((e) => e.name));
+  const mins = rows.reduce((a, e) => a + (e.validMins || 0), 0);
+  const tickets = rows.reduce((a, e) => a + e.tickets, 0);
+  const dist = rows.reduce((a, e) => a + (e.dist || 0), 0);
+  const flags = rows.filter((e) => e.flag).length;
+  const sd = surveyorDays.size || 1;
+  const timedSd = timedDays.size || 1;
+
+  const cards = state.mode === 'day' ? [
+    { v: people.size, l: people.size === 1 ? 'Surveyor out' : 'Surveyors out' },
+    { v: rows.length, l: rows.length === 1 ? 'Entry' : 'Entries' },
+    { v: num(mins / 60, 1), l: 'Hours on ground' },
+    { v: (mins / 60 / (new Set(rows.filter((e) => e.validMins != null).map((e) => e.name)).size || 1)).toFixed(1), l: 'Avg hours / surveyor' },
+    { v: tickets.toLocaleString('en-IN'), l: 'Tickets raised' },
+    { v: (tickets / people.size).toFixed(1), l: 'Avg tickets / surveyor' },
+    { v: Math.round(dist).toLocaleString('en-IN'), l: 'Km covered' }
+  ] : [
+    { v: people.size, l: people.size === 1 ? 'Surveyor' : 'Surveyors' },
+    { v: dates.size, l: dates.size === 1 ? 'Day logged' : 'Days logged',
+      sub: surveyorDays.size + ' surveyor-day' + (surveyorDays.size === 1 ? '' : 's') },
+    { v: Math.round(mins / 60).toLocaleString('en-IN'), l: 'Hours on ground' },
+    { v: (mins / 60 / timedSd).toFixed(1), l: 'Avg hours / surveyor-day' },
+    { v: tickets.toLocaleString('en-IN'), l: 'Tickets raised' },
+    { v: (tickets / sd).toFixed(1), l: 'Avg tickets / surveyor-day' },
+    { v: Math.round(dist).toLocaleString('en-IN'), l: 'Km covered' }
+  ];
+  if (flags) cards.push({ v: flags, l: flags === 1 ? 'Entry to check' : 'Entries to check', cls: 'flagged' });
+
+  el('stats').innerHTML = cards.map((c) =>
+    '<div class="stat ' + (c.cls || '') + '"><b>' + esc(c.v) + '</b><span>' + esc(c.l) + '</span>' +
+    (c.sub ? '<em>' + esc(c.sub) + '</em>' : '') + '</div>').join('');
+}
+
+function renderMuster(rows) {
+  const t = el('muster');
+  if (!rows.length) { t.innerHTML = '<tbody><tr><td class="empty" style="padding:18px">No entries match these filters.</td></tr></tbody>'; return; }
+  const names = [...new Set(rows.map((e) => e.name))].sort((a, b) => a.localeCompare(b));
+
+  // Span the whole selected period, not just days with entries — a blank column
+  // is the point of a muster. Future dates are trimmed off.
+  let min = rows[0].date, max = rows[rows.length - 1].date;
+  const bounds = periodBounds();
+  if (bounds) {
+    const today = new Date();
+    const end = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    min = bounds.from;
+    max = bounds.to < end ? bounds.to : end;
+    if (max < min) max = min;
+  }
+  const days = [];
+  for (let d = new Date(min); d <= max; d.setDate(d.getDate() + 1)) days.push(new Date(d));
+
+  const cellBy = new Map();
+  for (const e of rows) {
+    const k = e.name + '|' + e.dayKey;
+    const c = cellBy.get(k) || { mins: 0, timed: false, tickets: 0, dist: 0, flag: null, n: 0 };
+    if (e.validMins != null) { c.mins += e.validMins; c.timed = true; }
+    c.tickets += e.tickets; c.dist += e.dist || 0;
+    c.flag = c.flag || e.flag; c.n++;
+    cellBy.set(k, c);
+  }
+  const band = (c) => !c.timed ? 'h1' : c.mins < 120 ? 'h1' : c.mins < 240 ? 'h2' : c.mins < 360 ? 'h3' : c.mins < 480 ? 'h4' : 'h5';
+
+  let head = '<thead><tr><th class="name">Surveyor</th>';
+  let month = -1;
+  for (const d of days) {
+    const dow = (d.getDay() + 6) % 7;
+    const showMonth = d.getMonth() !== month;
+    month = d.getMonth();
+    head += '<th class="cell' + (dow === 6 ? ' sun' : '') + '" scope="col" title="' + esc(shortDate(d)) + '">' +
+      (showMonth ? '<div style="font-weight:600">' + MONTHS[d.getMonth()] + '</div>' : '') +
+      '<div>' + d.getDate() + '</div><div>' + DOW[dow] + '</div></th>';
+  }
+  head += '</tr></thead>';
+
+  let body = '<tbody>';
+  for (const n of names) {
+    body += '<tr><td class="name">' + esc(n) + '</td>';
+    for (const d of days) {
+      const c = cellBy.get(n + '|' + dayKey(d));
+      if (!c) body += '<td class="cell"><div class="mark" title="' + esc(n + ' \u2014 ' + shortDate(d) + ': not logged') + '"></div></td>';
+      else {
+        const tip = n + ' \u2014 ' + shortDate(d) + ': ' + (c.timed ? hhmm(c.mins) + ' h, ' : '') + c.tickets + ' tickets, ' +
+          num(c.dist, 0) + ' km' + (c.n > 1 ? ' (' + c.n + ' entries)' : '') + (c.flag ? ' \u2014 ' + c.flag : '');
+        body += '<td class="cell"><div class="mark ' + band(c) + (c.flag ? ' flag' : '') + '" title="' + esc(tip) + '"></div></td>';
+      }
+    }
+    body += '</tr>';
+  }
+  t.innerHTML = head + body + '</tbody>';
+}
+
+function aggregate(rows) {
+  const by = new Map();
+  for (const e of rows) {
+    const a = by.get(e.name) || { name: e.name, days: new Set(), timedDays: new Set(), mins: 0, tickets: 0, timedTickets: 0, dist: 0, flags: 0, wards: new Set(), entries: 0 };
+    a.days.add(e.dayKey); a.tickets += e.tickets;
+    if (e.validMins != null) { a.timedDays.add(e.dayKey); a.mins += e.validMins; a.timedTickets += e.tickets; }
+    a.dist += e.dist || 0; if (e.flag) a.flags++;
+    for (const w of e.wards) a.wards.add(w.wardKey);
+    a.entries++;
+    by.set(e.name, a);
+  }
+  return [...by.values()].map((a) => ({
+    name: a.name, days: a.days.size, entries: a.entries,
+    hours: a.mins / 60, tickets: a.tickets, dist: a.dist, flags: a.flags, wards: a.wards.size,
+    avgHours: a.timedDays.size ? a.mins / 60 / a.timedDays.size : null,
+    perDay: a.tickets / a.days.size,
+    perHour: a.mins ? a.timedTickets / (a.mins / 60) : null
+  }));
+}
+
+const COLS = [
+  { k: 'name', t: 'Surveyor' },
+  { k: 'days', t: 'Days', num: true },
+  { k: 'hours', t: 'Hours', num: true, bar: true, dp: 1 },
+  { k: 'avgHours', t: 'Avg hrs/day', num: true, dp: 1 },
+  { k: 'tickets', t: 'Tickets', num: true, bar: true, dp: 0 },
+  { k: 'perDay', t: 'Tickets/day', num: true, dp: 1 },
+  { k: 'perHour', t: 'Tickets/hr', num: true, dp: 1 },
+  { k: 'dist', t: 'Km', num: true, bar: true, dp: 0 },
+  { k: 'wards', t: 'Wards', num: true },
+  { k: 'flags', t: 'To check', num: true }
+];
+
+function renderSummary(rows) {
+  const t = el('summary');
+  const data = aggregate(rows);
+  if (!data.length) { t.innerHTML = '<tbody><tr><td class="empty" style="padding:18px">No entries match these filters.</td></tr></tbody>'; return; }
+  const max = {};
+  for (const c of COLS) if (c.bar) max[c.k] = Math.max(...data.map((d) => d[c.k] || 0), 1);
+  data.sort((a, b) => {
+    const x = a[state.sort], y = b[state.sort];
+    if (typeof x === 'string') return x.localeCompare(y) * state.dir;
+    return ((y ?? -1) - (x ?? -1)) * state.dir;
+  });
+  let html = '<thead><tr>' + COLS.map((c) =>
+    '<th class="sortable' + (c.num ? ' num' : '') + '" data-k="' + c.k + '"' +
+    (state.sort === c.k ? ' aria-sort="' + (state.dir === 1 ? 'descending' : 'ascending') + '"' : '') +
+    '>' + c.t + '</th>').join('') + '</tr></thead><tbody>';
+  for (const d of data) {
+    html += '<tr>';
+    for (const c of COLS) {
+      if (c.k === 'name') { html += '<td class="name-cell">' + esc(d.name) + '</td>'; continue; }
+      if (c.bar) {
+        const w = Math.max(2, Math.round((d[c.k] || 0) / max[c.k] * 100));
+        html += '<td class="bar-cell"><b>' + num(d[c.k], c.dp) + '</b><div class="bar"><i style="width:' + w + '%"></i></div></td>';
+        continue;
+      }
+      if (c.k === 'flags') { html += '<td class="num">' + (d.flags ? '<span class="tag">' + d.flags + '</span>' : '—') + '</td>'; continue; }
+      html += '<td class="num">' + num(d[c.k], c.dp ?? 0) + '</td>';
+    }
+    html += '</tr>';
+  }
+  t.innerHTML = html + '</tbody>';
+  t.querySelectorAll('th.sortable').forEach((th) => th.addEventListener('click', () => {
+    const k = th.dataset.k;
+    if (state.sort === k) state.dir *= -1;
+    else { state.sort = k; state.dir = 1; }
+    renderSummary(filtered());
+  }));
+}
+
+function renderLog(rows) {
+  const t = el('log');
+  el('logNote').textContent = rows.length + (rows.length === 1 ? ' entry' : ' entries') + ', most recent first.';
+  if (!rows.length) { t.innerHTML = '<tbody><tr><td class="empty" style="padding:18px">No entries match these filters.</td></tr></tbody>'; return; }
+  const list = [...rows].reverse();
+  t.innerHTML = '<thead><tr><th>Date</th><th>Surveyor</th><th>In</th><th>Out</th><th class="num">Hours</th>' +
+    '<th>Zone</th><th>Ward</th><th class="num">Tickets</th><th class="num">Km</th><th>Note</th></tr></thead><tbody>' +
+    list.map((e) => '<tr' + (e.flag ? ' class="is-flagged"' : '') + '>' +
+      '<td>' + pad(e.date.getDate()) + ' ' + MONTHS[e.date.getMonth()] + ' ' + e.date.getFullYear() + '</td>' +
+      '<td class="name-cell">' + esc(e.name) + '</td>' +
+      '<td>' + clock(e.start) + '</td><td>' + clock(e.end) + '</td>' +
+      '<td class="num">' + hhmm(e.mins) + '</td>' +
+      '<td>' + esc(e.zone || '—') + '</td><td class="wide">' + esc(e.wardRaw || '—') + '</td>' +
+      '<td class="num">' + e.tickets + '</td><td class="num">' + num(e.dist, 0) + '</td>' +
+      '<td>' + (e.flag ? '<span class="tag">' + esc(e.flag) + '</span>' : '') + '</td></tr>').join('') + '</tbody>';
+}
+
+/* ==========================================================================
+   EXPORT
+   ========================================================================== */
+function download() {
+  const data = aggregate(filtered());
+  const label = state.mode === 'all' ? 'All time' : el('period').selectedOptions[0].textContent;
+  const lines = [
+    ['Surveyor attendance summary — Kanpur'],
+    ['Period', label],
+    ['Surveyor', state.surveyor || 'All'],
+    ['Zone', state.zone || 'All'],
+    ['Generated', new Date().toLocaleString('en-IN')],
+    [],
+    ['Surveyor', 'Days logged', 'Entries', 'Hours', 'Avg hours/day', 'Tickets', 'Tickets/day', 'Tickets/hour', 'Km', 'Wards', 'To check']
+  ];
+  for (const d of data) lines.push([d.name, d.days, d.entries, d.hours.toFixed(2), d.avgHours == null ? '' : d.avgHours.toFixed(2),
+    d.tickets, d.perDay.toFixed(2), d.perHour == null ? '' : d.perHour.toFixed(2), Math.round(d.dist), d.wards, d.flags]);
+  const csv = lines.map((r) => r.map((c) => {
+    const s = String(c ?? '');
+    return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+  }).join(',')).join('\n');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8' }));
+  a.download = 'surveyor-attendance-' + label.replace(/[^\w]+/g, '-').toLowerCase() + '.csv';
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+/* ==========================================================================
+   EVENTS
+   ========================================================================== */
+el('mode').addEventListener('click', (ev) => {
+  const b = ev.target.closest('button[data-mode]');
+  if (!b) return;
+  state.mode = b.dataset.mode;
+  el('mode').querySelectorAll('button').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+  refreshPeriods();
+  render();
+});
+el('period').addEventListener('change', (e) => { state.period = e.target.value; render(); });
+el('surveyor').addEventListener('change', (e) => { state.surveyor = e.target.value; render(); });
+el('zone').addEventListener('change', (e) => { state.zone = e.target.value; render(); });
+el('reload').addEventListener('click', load);
+el('download').addEventListener('click', download);
+el('filePick').addEventListener('change', (e) => {
+  const f = e.target.files[0];
+  if (!f) return;
+  const r = new FileReader();
+  r.onload = () => {
+    try { ingest(String(r.result), 'From file, read '); }
+    catch (err) { showError(err); }
+  };
+  r.readAsText(f);
+});
+
+load();
+</script>
+</body>
+</html>
